@@ -1,0 +1,51 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: {uid}
+    // Fields:
+    //   - uid: string (required) - Firebase Auth UID
+    //   - displayName: string (optional)
+    //   - email: string (required)
+    //   - photoURL: string (optional)
+    //   - highScore: number (optional)
+    //   - completedN5: bool (optional)
+    //   - completedN4: bool (optional)
+    //   - savedWords: list (optional)
+    //   - createdAt: timestamp (optional)
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'email']) &&
+             data.uid is string &&
+             data.email is string &&
+             (!('displayName' in data) || data.displayName is string) &&
+             (!('highScore' in data) || data.highScore is number) &&
+             (!('completedN5' in data) || data.completedN5 is bool) &&
+             (!('completedN4' in data) || data.completedN4 is bool) &&
+             (!('savedWords' in data) || data.savedWords is list);
+    }
+
+    match /users/{uid} {
+      allow read: if isOwner(uid);
+      allow create: if isOwner(uid) && isValidUser(request.resource.data);
+      allow update: if isOwner(uid) && isValidUser(request.resource.data);
+      allow delete: if false; // Users cannot delete their profiles for now
+    }
+  }
+}

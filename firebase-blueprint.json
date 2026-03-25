@@ -1,0 +1,27 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Informasi profil pengguna dan kemajuan belajar.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "ID unik pengguna dari Firebase Auth" },
+        "displayName": { "type": "string", "description": "Nama tampilan pengguna" },
+        "email": { "type": "string", "description": "Alamat email pengguna" },
+        "photoURL": { "type": "string", "description": "URL foto profil" },
+        "highScore": { "type": "integer", "description": "Skor kuis tertinggi" },
+        "completedN5": { "type": "boolean", "description": "Apakah level N5 sudah selesai" },
+        "completedN4": { "type": "boolean", "description": "Apakah level N4 sudah selesai" },
+        "savedWords": { "type": "array", "description": "Daftar kosakata yang disimpan", "items": { "type": "string" } },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Waktu pembuatan akun" }
+      },
+      "required": ["uid", "email"]
+    }
+  },
+  "firestore": {
+    "/users/{uid}": {
+      "schema": "UserProfile",
+      "description": "Data profil pengguna"
+    }
+  }
+}
